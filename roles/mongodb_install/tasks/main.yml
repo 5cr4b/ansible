@@ -1,0 +1,50 @@
+---
+- hosts: mongodb
+  tasks:
+    # install mongodb-org
+    - name: install mongodb-org
+      apt: 
+        name: mongodb-org
+        state: latest 
+      become: true
+
+    #stop mongdodb service
+    - name: stop mongodb
+      service:
+        name: mongod
+        state: stopped
+      become: true
+    
+    #move default mongodb folder to disk mounted  
+    - name: mv mongodb default folder to /data/mongodb
+      copy:
+        src: /var/lib/mongodb
+        dest: /data/mongodb 
+    #change owner new folder
+    - name: change owner to mongodb
+      file:
+        path: /data/mongodb
+        owner: "mongodb"
+        group: "mongodb"
+    # delete default folder
+    - name: delete mongodb default folder
+      file:
+        path: /var/lib/mongodb 
+        state: absent 
+
+    # create a symlink
+    - name: create a symlink 
+      file:
+        src: /data/mongodb
+        dest: /var/lib/mongodb
+        owner: mongodb
+        group: mongodb
+        state: link
+
+    # change owner to new parttion
+    #- name: change owner db to mongodb user
+    - name: start mongodb
+      service:
+        name: mongod
+        state: restarted
+      become: true

@@ -1,0 +1,4 @@
+---
+- hosts: worker2
+  roles:
+    - role: mongodb

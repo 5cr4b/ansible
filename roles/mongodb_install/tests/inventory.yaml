@@ -1,0 +1,23 @@
+all:
+  children:
+    webserver:
+      children:
+        nginx:
+          hosts:
+            192.168.60.130
+        apache:
+          hosts:
+            192.168.60.152
+    dbserver:
+      children:
+        mongodb:
+          hosts:
+            192.168.60.130
+        postgressql:
+            192.168.60.152
+    dev:
+      children:
+        webserver:
+        dbserver:
+
+

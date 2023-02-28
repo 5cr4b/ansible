@@ -1,0 +1,22 @@
+---
+- hosts: mongodb
+  tasks:
+    #add mongo  repo
+    - name: add mongodb repo 
+      apt_key:
+        url: "https://www.mongodb.org/static/pgp/server-6.0.asc"
+        state: present
+      become: true 
+
+    - name: create list file version
+      command: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+      become: true
+    
+    #check repository
+    #- name: check mongodb in repository yet
+    #   apt_repository:
+    - name: Ensure MongoDB apt repository exists
+      apt_repository:
+        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse"
+        state: present
+        #filename: "mongodb-{{ mongodb_version }}"  

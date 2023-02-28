@@ -1,0 +1,26 @@
+---
+- hosts: mongodb
+  tasks:
+    - name: stop mongodb service  
+      service: 
+        name: mongod
+        state: stopped
+      become: true
+
+    - name: rm mongodb
+      apt:
+        name: mongodb-org*
+        state: absent
+
+      become: true
+    - name: rm file mongodb
+      file:
+        src: /var/log/mongodb
+        status: absent
+      become: true
+
+    - name: rm lib mongodb 
+      file: 
+        src: /var/lib/mongodb
+        status: absent
+      become: true
