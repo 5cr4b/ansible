@@ -32,6 +32,7 @@
         fstype: ext4
         state: mounted
       become: true
+
     - name: add mongodb repo 
       apt_key:
         url: "https://www.mongodb.org/static/pgp/server-6.0.asc"
@@ -42,13 +43,17 @@
       command: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
       become: true
     
+    - name: apt update
+      apt:
+        update-cache: yes 
+      become: true
     #check repository
     #- name: check mongodb in repository yet
     #   apt_repository:
-    - name: Ensure MongoDB apt repository exists
-      apt_repository:
-        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse"
-        state: present
+    #- name: Ensure MongoDB apt repository exists
+    #  apt_repository:
+    #    repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse"
+    #    state: present
         #filename: "mongodb-{{ mongodb_version }}"
 
     # install mongodb-org

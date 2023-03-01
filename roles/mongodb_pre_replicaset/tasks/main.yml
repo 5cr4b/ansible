@@ -1,6 +1,7 @@
 ---
 - hosts: mongodb
   tasks:
+   
     - name: stop mongodb service  
       service: 
         name: mongod
@@ -16,7 +17,7 @@
     # enable replicaset file config
     - name: copy file to remote host
       copy: 
-        src: replication.conf
+        src: ../files/replicaset.conf
         dest: /etc/mongod.conf
 
     - name: restart mongodb service
@@ -24,8 +25,3 @@
         name: mongod
         state: restarted
       become: true
-
-    - name: starting replicaset 
-      command: 
-        mongosh --eval "rs.initiate({_id : 'rs0',members: [{'_id': 0, 'host': '192.168.60.152:27017' },{'_id': 1, 'host': '192.168.60.130:27017' },{'_id': 2, 'host': '192.168.60.154:27017' }]})"
-     

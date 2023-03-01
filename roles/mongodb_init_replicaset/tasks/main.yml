@@ -1,0 +1,13 @@
+---
+- hosts: mongodb_init
+  tasks:
+    - name: starting replicaset 
+      community.mongodb.mongodb_replicasett:
+        login_hosts: localhost
+        login_user:  admin
+        login_password:  nam 
+        replicaset: rs0
+        members:
+        - 192.168.60.152
+        - 192.168.60.130
+        - 192.168.60.154
