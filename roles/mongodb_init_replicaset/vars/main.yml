@@ -1,2 +1,6 @@
 ---
 # vars file for mongodb_init_replicaset
+login_host: 192.168.60.130
+user: mongodb
+password: nam
+replicaset_name: rs0

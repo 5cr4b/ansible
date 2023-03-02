@@ -1,2 +1,9 @@
 ---
-# vars file for mongodb-all
+mounted_path: /data/mongodb 
+mounted_disk: /dev/sdb 
+file_system_type : ext4
+mongodb_version: "6.0"
+mongo_repo: https://www.mongodb.org/static/pgp/server-{{ mongodb_version }}.asc
+mongo_user: mongodb
+mongo_group: mongodb
+mongo_default_folder: /var/lib/mongodb 

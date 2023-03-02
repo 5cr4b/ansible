@@ -1,13 +1,31 @@
 ---
 - hosts: mongodb_init
+  vars_files:
+    ../vars/main.yml
   tasks:
+    - name: install pip3
+      apt:
+        name: python3-pip
+        state: present
+      become: true
+
+    - name: install set up tool
+      apt:
+        name: python-setuptools
+        state: present
+      become: true
+
+    - name: install pymongo
+      pip:
+        name: pymongo
+
     - name: starting replicaset 
-      community.mongodb.mongodb_replicasett:
-        login_hosts: localhost
-        login_user:  admin
-        login_password:  nam 
-        replicaset: rs0
+      community.mongodb.mongodb_replicaset:
+        login_host: "{{ login_host }}"
+        login_user:  "{{ user }}"
+        login_password:  "{{ password }}"
+        replica_set: "{{ replicaset_name }}"
         members:
         - 192.168.60.152
         - 192.168.60.130
-        - 192.168.60.154 
+        - 192.168.60.154

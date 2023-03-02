@@ -1,2 +1,3 @@
 ---
+replicaset_name: "rs0"
 # vars file for mongodb_replicaset

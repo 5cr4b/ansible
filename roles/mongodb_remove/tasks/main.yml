@@ -1,26 +1,39 @@
 ---
 - hosts: mongodb
   tasks:
+    - name: unmount dev/sdb1
+      mount:
+        path: /data/mongodb
+        state: absent
+      become: true
+
     - name: stop mongodb service  
       service: 
         name: mongod
-        state: stopped
-      become: true
+        state: stopped   
 
     - name: rm mongodb
       apt:
         name: mongodb-org*
         state: absent
-
       become: true
+
     - name: rm file mongodb
       file:
-        src: /var/log/mongodb
-        status: absent
+        path: /var/log/mongodb
+        state: absent
       become: true
 
     - name: rm lib mongodb 
       file: 
-        src: /var/lib/mongodb
-        status: absent
+        path: /var/lib/mongodb
+        state: absent
       become: true
+
+    
+    - name: apt update
+      apt:
+        upgrade: tes
+        update-cache: yes
+        allow_unauthenticated: yes
+      become: true        

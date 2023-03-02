@@ -1,0 +1,10 @@
+[mongodb]
+#192.168.60.152
+192.168.60.130
+#192.168.60.154
+
+[mongodb_init]
+192.168.60.130
+
+[mongodb_init:vars]
+ansible_python_interpreter=/usr/bin/python3

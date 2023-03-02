@@ -1,19 +1,23 @@
 ---
 - hosts: mongodb
+  vars_files:
+    - ../vars/main.yml
   tasks:
     # create /data/mongodb
     - name: create a folder data 
-      file: 
-        path: /data/mongodb 
+      ansible.builtin.file: 
+        
+        path: "{{ mounted_path }}"
         state: directory
       become: true
   
     #create parttion 
     - name: create parttion 
       parted:
-        device: /dev/sdb 
+        device: "{{ mounted_disk }}"
         number: 1
         state: present
+      register: _mounted_disk_number
       become: true
     
     #format parttion
@@ -23,83 +27,88 @@
 
     # mount file system
     - name: mount extra disk
-      vars:
-        mount_path: /data/mongodb
-        mount_src: /dev/sdb1
       mount:
-        path: "{{mount_path}}"
-        src: "{{mount_src}}"
-        fstype: ext4
+        path: "{{ mounted_path }}"
+        src: /dev/sdb1
+        fstype: "{{ file_system_type }}"
         state: mounted
       become: true
-
+ 
+    #
     - name: add mongodb repo 
-      apt_key:
-        url: "https://www.mongodb.org/static/pgp/server-6.0.asc"
+      ansible.builtin.apt_key:
+        url: "{{ mongo_repo }}"
         state: present
+        validate_certs: false
       become: true 
-
+      retries: 5
+    #
     - name: create list file version
       command: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
       become: true
-    
+      retries: 5
+      #notify: 
+      #  - apt update
     - name: apt update
-      apt:
+      ansible.builtin.apt:
+        upgrade: yes
         update-cache: yes 
+        allow_unauthenticated: true
       become: true
-    #check repository
-    #- name: check mongodb in repository yet
-    #   apt_repository:
-    #- name: Ensure MongoDB apt repository exists
-    #  apt_repository:
-    #    repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse"
-    #    state: present
-        #filename: "mongodb-{{ mongodb_version }}"
+      retries: 5
 
     # install mongodb-org
     - name: install mongodb-org
-      apt: 
+      ansible.builtin.apt: 
         name: mongodb-org
-        state: latest 
-      become: true
-
-    #stop mongdodb service
-    - name: stop mongodb
-      service:
-        name: mongod
-        state: stopped
+        state: present
       become: true
     
     #move default mongodb folder to disk mounted  
     - name: mv mongodb default folder to /data/mongodb
-      copy:
-        src: /var/lib/mongodb
-        dest: /data/mongodb 
+      ansible.builtin.copy:
+        remote_src: true
+        src: "{{ mongo_default_folder }}"
+        dest: "{{ mounted_path }}"
+      #notify:
+      #  - stop mongodb
+      become: true
+
+    #stop mongdodb service
+    - name: stop mongodb        
+      ansible.builtin.service:
+        name: mongod
+        state: stopped
+      become: true
+
     #change owner new folder
     - name: change owner to mongodb
-      file:
+      ansible.builtin.file:
         path: /data/mongodb
-        owner: "mongodb"
-        group: "mongodb"
+        owner: "{{ mongo_user }}"
+        group: "{{ mongo_group }}"
+
     # delete default folder
     - name: delete mongodb default folder
-      file:
-        path: /var/lib/mongodb 
+      ansible.builtin.file:
+        path: "{{ mongo_default_folder }}"
         state: absent 
+      become: true
 
     # create a symlink
     - name: create a symlink 
-      file:
-        src: /data/mongodb
-        dest: /var/lib/mongodb
-        owner: mongodb
-        group: mongodb
+      ansible.builtin.file:
+        src: "{{ mounted_path }}"
+        dest: "{{ mongo_default_folder }}"
+        owner: "{{ mongo_user }}"
+        group: "{{ mongo_group }}"
         state: link
+      #notify:
+      #  - restart mongodb
 
-    # change owner to new parttion
-    #- name: change owner db to mongodb user
-    - name: start mongodb
-      service:
+    # handlers file for mongodb-all
+    - name: restart mongodb
+      ansible.builtin.service:
         name: mongod
         state: restarted
       become: true

@@ -1,2 +1,27 @@
 ---
+
 # handlers file for mongodb-all
+- name: restart mongodb
+  listen: restart mongodb
+  ansible.builtin.service:
+    name: mongod
+    state: restarted
+  become: true
+
+
+#stop mongdodb service
+- name: stop mongodb
+  listen: stop mongodb
+  ansible.builtin.service:
+    name: mongod
+    state: stopped
+  become: true
+
+
+# apt update
+- name: apt update
+  listen: apt update
+  ansible.builtin.apt:
+    upgrade: yes
+    update-cache: yes 
+  become: true

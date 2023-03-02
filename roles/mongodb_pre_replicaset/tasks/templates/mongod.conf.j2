@@ -12,7 +12,7 @@ systemLog:
 # network interfaces
 net:
   port: 27017
-  bindIp: 127.0.0.1,${hostname -I}
+  bindIp: 127.0.0.1,${ host_ip -i}
 
 
 # how the process runs
@@ -24,4 +24,4 @@ processManagement:
 #operationProfiling:
 
 replication:
-  replSetName: "rs0"
+  replSetName: "{{ replicaset_name }}"

@@ -1,2 +1,14 @@
 ---
 # handlers file for mongodb_replicaset
+
+- name: stop mongodb  
+  service: 
+    name: mongod
+    state: stopped
+  become: true
+
+- name: restart mongodb 
+  service:
+    name: mongod
+    state: restarted
+  become: true

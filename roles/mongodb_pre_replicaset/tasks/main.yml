@@ -1,27 +1,39 @@
 ---
 - hosts: mongodb
+  vars_files:
+    ../vars/main.yml
   tasks:
-   
-    - name: stop mongodb service  
+    - name: stop mongodb  
       service: 
         name: mongod
         state: stopped
       become: true
 
-    - name: delete default config
-      file:
-        path: /etc/mongod.conf
-        state: absent
-      become: true
+    - name: add template conf
+      template:
+        src: mongod.conf.j2
+        dest: /etc/mongod.conf
+        owner: mongodb
+        group: mongodb
+
+    #- name: delete default config
+    #  file:
+    #    path: /etc/mongod.conf
+    #    state: absent
+    #  become: true
+      #notify: stop mongodb
       
     # enable replicaset file config
-    - name: copy file to remote host
-      copy: 
-        src: ../files/replicaset.conf
-        dest: /etc/mongod.conf
+    #- name: copy file to remote host
+    #  copy: 
+    #    src: ../files/replicaset.conf
+    #    dest: /etc/mongod.conf
+      #notify: restart mongodb
 
-    - name: restart mongodb service
+    - name: restart mongodb 
       service:
         name: mongod
         state: restarted
       become: true
+
+    
